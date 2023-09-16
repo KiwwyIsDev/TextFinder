@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Finder</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Finder</h1>
+    
+    <!-- Input field for user to enter data -->
+    <label for="dataInput">Enter data:</label>
+    <textarea id="dataInput" placeholder="Type data here" rows="4" cols="50"></textarea>
+
+    <!-- Input field for user to enter text to find (with multi-line support) -->
+    <label for="searchText">Enter text to find (separate lines with '\n'):</label>
+    <textarea id="searchText" placeholder="Type text here" rows="4" cols="50"></textarea>
+    <button onclick="findText()">Find</button>
+
+    <!-- Display area for matching results -->
+    <div id="results">
+        <h2>Results:</h2>
+        <ul id="resultList"></ul>
+        <p id="notFoundMessage" style="color: red;"></p>
+    </div>
+
+    <script>
+        // Function to find and display text
+        function findText() {
+            const data = document.getElementById("dataInput").value;
+            const searchText = document.getElementById("searchText").value;
+            const searchLines = searchText.split('\n');
+            const lines = data.split('\n');
+            const resultList = document.getElementById("resultList");
+            const notFoundMessage = document.getElementById("notFoundMessage");
+
+            // Clear previous results and message
+            resultList.innerHTML = "";
+            notFoundMessage.textContent = "";
+
+            let found = false;
+
+            // Loop through each line of the search input
+            for (const searchLine of searchLines) {
+                // Loop through each line of the data
+                for (const line of lines) {
+                    if (line.includes(searchLine)) {
+                        // Create a list item for each match
+                        const listItem = document.createElement("li");
+                        listItem.textContent = line;
+                        resultList.appendChild(listItem);
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found) {
+                // Display a "Not found" message if no matches were found
+                notFoundMessage.textContent = "Not found.";
+            }
+        }
+    </script>
+</body>
+</html>
