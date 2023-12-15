@@ -1,4 +1,6 @@
 # TextFinder
+free use: https://kiwwyisdev.github.io/TextFinder/
+
 **หากคุณต้องการค้นหาคำบางคำจากข้อมูลที่มีอยู่มากสามารถใช้ TextFinder ในการหาได้ เช่น**
 *ข้อมูลที่ต้องการหา*
 
