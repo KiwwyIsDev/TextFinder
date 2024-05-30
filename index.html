@@ -3,9 +3,14 @@
 <head>
     <title>Text Finder</title>
     <style>
-        /* Add some basic styling */
         body {
             font-family: Arial, sans-serif;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        #notFoundMessage {
+            color: red;
         }
     </style>
 </head>
@@ -24,8 +29,10 @@
     <!-- Display area for matching results -->
     <div id="results">
         <h2>Results:</h2>
-        <ul id="resultList"></ul>
-        <p id="notFoundMessage" style="color: red;"></p>
+        <textarea id="resultOutput" rows="10" cols="50" readonly></textarea>
+        <br>
+        <button onclick="copyOutput()">Copy Output</button>
+        <p id="notFoundMessage"></p>
     </div>
 
     <script>
@@ -35,33 +42,40 @@
             const searchText = document.getElementById("searchText").value;
             const searchLines = searchText.split('\n');
             const lines = data.split('\n');
-            const resultList = document.getElementById("resultList");
+            const resultOutput = document.getElementById("resultOutput");
             const notFoundMessage = document.getElementById("notFoundMessage");
 
             // Clear previous results and message
-            resultList.innerHTML = "";
+            resultOutput.value = "";
             notFoundMessage.textContent = "";
 
             let found = false;
+            let results = [];
 
             // Loop through each line of the search input
             for (const searchLine of searchLines) {
                 // Loop through each line of the data
                 for (const line of lines) {
                     if (line.includes(searchLine)) {
-                        // Create a list item for each match
-                        const listItem = document.createElement("li");
-                        listItem.textContent = line;
-                        resultList.appendChild(listItem);
+                        results.push(line);
                         found = true;
                     }
                 }
             }
 
-            if (!found) {
-                // Display a "Not found" message if no matches were found
+            if (found) {
+                resultOutput.value = results.join('\n');
+            } else {
                 notFoundMessage.textContent = "Not found.";
             }
+        }
+
+        // Function to copy the output to clipboard
+        function copyOutput() {
+            const resultOutput = document.getElementById("resultOutput");
+            resultOutput.select();
+            document.execCommand("copy");
+            alert("Output copied to clipboard.");
         }
     </script>
 </body>
