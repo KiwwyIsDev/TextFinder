@@ -1,82 +1,314 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Finder</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary-color: #4a6fa5;
+            --accent-color: #47b882;
+            --bg-color: #f5f7fa;
+            --text-color: #333;
+            --error-color: #e74c3c;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #fff;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #3a5a84;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        #copyBtn {
+            background-color: var(--accent-color);
+        }
+        
+        #copyBtn:hover {
+            background-color: #3a9b6d;
+        }
+        
         #results {
             margin-top: 20px;
         }
+        
         #notFoundMessage {
-            color: red;
+            color: var(--error-color);
+            margin-top: 10px;
+            font-weight: 500;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        #notFoundMessage.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
     <h1>Text Finder</h1>
     
-    <!-- Input field for user to enter data -->
-    <label for="dataInput">Enter data:</label>
-    <textarea id="dataInput" placeholder="Type data here" rows="4" cols="50"></textarea>
+    <div class="container">
+        <div class="card">
+            <!-- Input field for user to enter data -->
+            <div class="input-group">
+                <label for="dataInput">Enter data:</label>
+                <textarea id="dataInput" placeholder="Type or paste your data here" rows="8"></textarea>
+            </div>
 
-    <!-- Input field for user to enter text to find (with multi-line support) -->
-    <label for="searchText">Enter text to find (separate lines with '\n'):</label>
-    <textarea id="searchText" placeholder="Type text here" rows="4" cols="50"></textarea>
-    <button onclick="findText()">Find</button>
+            <!-- Input field for user to enter text to find -->
+            <div class="input-group">
+                <label for="searchText">Enter text to find (separate lines with '\n'):</label>
+                <textarea id="searchText" placeholder="Type text to search for" rows="4"></textarea>
+            </div>
+            
+            <button id="findBtn" onclick="findText()">Find Text</button>
+        </div>
 
-    <!-- Display area for matching results -->
-    <div id="results">
-        <h2>Results:</h2>
-        <textarea id="resultOutput" rows="10" cols="50" readonly></textarea>
-        <br>
-        <button onclick="copyOutput()">Copy Output</button>
-        <p id="notFoundMessage"></p>
+        <div class="card">
+            <!-- Display area for matching results -->
+            <div id="results">
+                <h2>Results:</h2>
+                <textarea id="resultOutput" rows="10" readonly></textarea>
+                <div id="notFoundMessage">No matches found.</div>
+                <button id="copyBtn" onclick="copyOutput()">Copy Results</button>
+            </div>
+        </div>
     </div>
+    
+    <div id="toast" class="toast">Copied to clipboard!</div>
 
     <script>
-        // Function to find and display text
+        // Function to find and display text with debouncing
+        let debounceTimeout;
+        
         function findText() {
-            const data = document.getElementById("dataInput").value;
-            const searchText = document.getElementById("searchText").value;
-            const searchLines = searchText.split('\n');
-            const lines = data.split('\n');
-            const resultOutput = document.getElementById("resultOutput");
-            const notFoundMessage = document.getElementById("notFoundMessage");
+            clearTimeout(debounceTimeout);
+            
+            debounceTimeout = setTimeout(() => {
+                const data = document.getElementById("dataInput").value;
+                const searchText = document.getElementById("searchText").value;
+                const searchLines = searchText.trim().split('\n');
+                const lines = data.split('\n');
+                const resultOutput = document.getElementById("resultOutput");
+                const notFoundMessage = document.getElementById("notFoundMessage");
 
-            // Clear previous results and message
-            resultOutput.value = "";
-            notFoundMessage.textContent = "";
+                // Clear previous results and message
+                resultOutput.value = "";
+                notFoundMessage.classList.remove("show");
 
-            let found = false;
-            let results = [];
+                // Performance optimization for large datasets
+                const results = new Set();
+                let found = false;
 
-            // Loop through each line of the search input
-            for (const searchLine of searchLines) {
-                // Loop through each line of the data
-                for (const line of lines) {
-                    if (line.includes(searchLine)) {
-                        results.push(line);
-                        found = true;
+                // Loop through each line of the search input
+                for (const searchLine of searchLines) {
+                    if (!searchLine.trim()) continue;
+                    
+                    // Loop through each line of the data
+                    for (const line of lines) {
+                        if (line.includes(searchLine)) {
+                            results.add(line);
+                            found = true;
+                        }
                     }
                 }
-            }
 
-            if (found) {
-                resultOutput.value = results.join('\n');
-            } else {
-                notFoundMessage.textContent = "Not found.";
-            }
+                if (found) {
+                    resultOutput.value = Array.from(results).join('\n');
+                } else {
+                    notFoundMessage.classList.add("show");
+                }
+            }, 300); // 300ms debounce delay
         }
 
         // Function to copy the output to clipboard
         function copyOutput() {
             const resultOutput = document.getElementById("resultOutput");
-            resultOutput.select();
-            document.execCommand("copy");
-            alert("Output copied to clipboard.");
+            if (!resultOutput.value.trim()) return;
+            
+            // Use the Clipboard API for better performance
+            navigator.clipboard.writeText(resultOutput.value)
+                .then(() => showToast())
+                .catch(() => {
+                    // Fallback to older method if Clipboard API fails
+                    resultOutput.select();
+                    document.execCommand("copy");
+                    showToast();
+                });
         }
+        
+        // Show toast notification
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.classList.add("show");
+            
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2000);
+        }
+        
+        // Event listeners for better user experience
+        document.addEventListener("DOMContentLoaded", function() {
+            const dataInput = document.getElementById("dataInput");
+            const searchText = document.getElementById("searchText");
+            
+            // Enable find on Enter key in search field
+            searchText.addEventListener("keydown", function(event) {
+                if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    findText();
+                }
+            });
+            
+            // Auto-resize textareas for better usability
+            const autoResize = (element) => {
+                element.style.height = "auto";
+                element.style.height = (element.scrollHeight) + "px";
+            };
+            
+            dataInput.addEventListener("input", function() { 
+                if (this.value.length > 1000) {
+                    // Disable auto-resize for large inputs
+                    return;
+                }
+                autoResize(this);
+            });
+            
+            searchText.addEventListener("input", function() {
+                autoResize(this);
+            });
+        });
     </script>
 </body>
 </html>
